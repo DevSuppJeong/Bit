@@ -10,6 +10,8 @@ class MainView(QDialog):
 
         # MEMBER
         self.btcPriceLabel = QLabel(self)
+        self.fluctuationLabel = QLabel(self)
+        self.fluctuationLabel.setAlignment(Qt.AlignRight)
         self.entryPriceEdit = QLineEdit(self)
         self.timer = QTimer(self)
 
@@ -30,13 +32,24 @@ class MainView(QDialog):
 
         value = res.json()
         df = pd.DataFrame(value)
+        indexPrice = float(df.iloc[999][1])
 
-        self.btcPriceLabel.setText(df.iloc[999][1])
+        self.btcPriceLabel.setText(str(round(indexPrice, 2)))
+
+        entryPrice = self.entryPriceEdit.text()
+        if entryPrice == "":
+            self.fluctuationLabel.setText("")
+            return
+        else:
+            entryPrice = float(entryPrice)
+        fluctuation = indexPrice / entryPrice * 100.0 - 100.0
+        self.fluctuationLabel.setText(str(round(fluctuation, 2)) + "%")
 
     def initUI(self):
         grid = QGridLayout()
-        grid.addWidget(self.btcPriceLabel,   0, 0, 1, 2)
-        grid.addWidget(self.entryPriceEdit,  1, 0, 1, 2)
+        grid.addWidget(self.btcPriceLabel,      0, 0, 1, 1)
+        grid.addWidget(self.fluctuationLabel,   0, 1, 1, 1)
+        grid.addWidget(self.entryPriceEdit,     1, 0, 1, 2)
 
         self.setLayout(grid)
 
